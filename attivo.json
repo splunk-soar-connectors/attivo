@@ -4,17 +4,17 @@
     "description": "Interact with Attivo BOTsink",
     "type": "network security",
     "product_vendor": "Attivo",
-    "logo": "attivo.png",
-    "logo_dark": "attivo_dark.png",
+    "logo": "attivo.svg",
+    "logo_dark": "attivo_dark.svg",
     "product_name": "BOTsink",
     "product_version_regex": ".*",
     "publisher": "Attivo",
-    "license": "Copyright (c) Attivo, 2018",
+    "license": "Copyright (c) Attivo, 2019",
     "app_version": "1.0.0",
     "utctime_updated": "2018-07-26T22:21:39.422622Z",
     "package_name": "phantom_attivo",
     "main_module": "attivo_connector.pyc",
-    "min_phantom_version": "3.5.210",
+    "min_phantom_version": "4.0.1068",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "botsink": {
@@ -73,8 +73,8 @@
         {
             "action": "on poll",
             "identifier": "on_poll",
-            "description": "Injest alerts from the Attivo BOTsink",
-            "verbose": "Ingest alerts from the Attivo BOTsink",
+            "description": "Ingest alerts from the Attivo BOTsink",
+            "verbose": "",
             "type": "ingest",
             "read_only": true,
             "parameters": {
@@ -106,7 +106,7 @@
                     "required": true,
                     "primary": false,
                     "contains": ["ip"],
-                    "order": 1
+                    "order": 0
                 },
                 "hours_back": {
                     "description": "The number of hours ago to start the search",
@@ -114,16 +114,16 @@
                     "required": true,
                     "primary": false,
                     "default": "1",
-                    "order": 2
+                    "order": 1
                 },
                 "severity": {
-                    "description": "The number of hours ago to start the search",
+                    "description": "The minimum severity for retrieved events",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
                     "value_list": ["Very High", "High", "Medium", "Low", "Very Low", "System Activity"],
                     "default": "Medium",
-                    "order": 3
+                    "order": 2
                 }
             },
             "output": [
@@ -193,7 +193,7 @@
             "action": "check user",
             "identifier": "check_user",
             "description": "Verify whether a user is Deceptive",
-            "verbose": "Verify whether a user is Deceptive",
+            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -252,7 +252,7 @@
             "action": "check host",
             "identifier": "check_host",
             "description": "Verify whether a host is Deceptive",
-            "verbose": "Verify whether a host is Deceptive",
+            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -348,7 +348,7 @@
 	    "action": "list hosts",
             "identifier": "list_hosts",
             "description": "List all deceptive hosts (network decoys) on the Attivo BOTsink",
-            "verbose": "List all deceptive hosts (network decoys) on the Attivo BOTsink",
+            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -418,7 +418,7 @@
 	    "action": "list users",
             "identifier": "list_users",
             "description": "List all deceptive users on the Attivo BOTsink",
-            "verbose": "List all deceptive users on the Attivo BOTsink",
+            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -457,7 +457,7 @@
 	    "action": "list playbooks",
             "identifier": "list_playbooks",
             "description": "List all configured playbooks on the Attivo BOTsink",
-            "verbose": "List all configured playbooks on the Attivo BOTsink",
+            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -515,7 +515,7 @@
             "action": "run playbook",
             "identifier": "run_playbook",
             "description": "Run a preconfigured Playbook on the Attivo BOTsink",
-            "verbose": "Run a preconfigured Playbook on the Attivo BOTsink",
+            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
