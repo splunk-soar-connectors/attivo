@@ -4,8 +4,8 @@
     "description": "Interact with Attivo BOTsink",
     "type": "network security",
     "product_vendor": "Attivo",
-    "logo": "attivo.svg",
-    "logo_dark": "attivo_dark.svg",
+    "logo": "logo_attivo.svg",
+    "logo_dark": "logo_attivo_dark.svg",
     "product_name": "BOTsink",
     "product_version_regex": ".*",
     "publisher": "Attivo",
@@ -74,7 +74,6 @@
             "action": "on poll",
             "identifier": "on_poll",
             "description": "Ingest alerts from the Attivo BOTsink",
-            "verbose": "",
             "type": "ingest",
             "read_only": true,
             "parameters": {
@@ -117,7 +116,7 @@
                     "order": 1
                 },
                 "severity": {
-                    "description": "The minimum severity for retrieved events",
+                    "description": "severity of alerts generated in Attivo",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -193,7 +192,6 @@
             "action": "check user",
             "identifier": "check_user",
             "description": "Verify whether a user is Deceptive",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -252,7 +250,6 @@
             "action": "check host",
             "identifier": "check_host",
             "description": "Verify whether a host is Deceptive",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -348,7 +345,6 @@
 	    "action": "list hosts",
             "identifier": "list_hosts",
             "description": "List all deceptive hosts (network decoys) on the Attivo BOTsink",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -418,7 +414,6 @@
 	    "action": "list users",
             "identifier": "list_users",
             "description": "List all deceptive users on the Attivo BOTsink",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -457,7 +452,6 @@
 	    "action": "list playbooks",
             "identifier": "list_playbooks",
             "description": "List all configured playbooks on the Attivo BOTsink",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -515,7 +509,6 @@
             "action": "run playbook",
             "identifier": "run_playbook",
             "description": "Run a preconfigured Playbook on the Attivo BOTsink",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
