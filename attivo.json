@@ -105,7 +105,7 @@
                     "description": "The source IP to search for in Attivo alerts",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": ["ip"],
                     "order": 0
                 },
@@ -202,8 +202,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -260,8 +258,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -343,14 +339,14 @@
             },
             "versions": "EQ(*)"
         },
-	{
-	    "action": "list hosts",
+        {
+            "action": "list hosts",
             "identifier": "list_hosts",
             "description": "List all deceptive hosts (network decoys) on the Attivo BOTsink",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
-	    "output": [
+            "output": [
                 {
                     "data_path": "action_result.data.*.host",
                     "data_type": "string",
@@ -412,14 +408,14 @@
             },
             "versions": "EQ(*)"
         },
-	{
-	    "action": "list users",
+	    {
+	        "action": "list users",
             "identifier": "list_users",
             "description": "List all deceptive users on the Attivo BOTsink",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
-	    "output": [
+	        "output": [
                 {
                     "data_path": "action_result.data.*.user",
                     "data_type": "string",
@@ -450,14 +446,14 @@
             },
             "versions": "EQ(*)"
         },
-	{
-	    "action": "list playbooks",
+	    {
+	        "action": "list playbooks",
             "identifier": "list_playbooks",
             "description": "List all configured playbooks on the Attivo BOTsink",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
-	    "output": [
+	        "output": [
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
@@ -506,7 +502,6 @@
             },
             "versions": "EQ(*)"
         },
-
         {
             "action": "run playbook",
             "identifier": "run_playbook",
@@ -518,19 +513,15 @@
                     "description": "The name of the preconfigured Playbook on the Attivo BOTsink",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
+                    "primary": false,
                     "order": 0
                 },
                 "attacker_ip": {
                     "description": "The attacker IP address to feed to the Playbook",
                     "data_type": "string",
                     "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": ["ip"],
-                    "value_list": [],
                     "default": "1",
                     "order": 1
                 }
@@ -595,7 +586,6 @@
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": 1,
                     "order": 1
                 }
