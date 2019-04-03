@@ -56,15 +56,14 @@
             "required": true,
             "default": 0,
             "order": 5
-       }
+        }
     },
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -72,9 +71,9 @@
         },
         {
             "action": "on poll",
-            "identifier": "on_poll",
             "description": "Ingest alerts from the Attivo BOTsink",
             "type": "ingest",
+            "identifier": "on_poll",
             "read_only": true,
             "parameters": {
                 "severity": {
@@ -95,10 +94,9 @@
         },
         {
             "action": "get events",
-            "identifier": "get_events",
             "description": "Pull Attivo events based on source IP and timeframe",
-            "verbose": "",
             "type": "investigate",
+            "identifier": "get_events",
             "read_only": true,
             "parameters": {
                 "attacker_ip": {
@@ -106,7 +104,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "order": 0
                 },
                 "hours_back": {
@@ -122,7 +122,14 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "value_list": ["Very High", "High", "Medium", "Low", "Very Low", "System Activity"],
+                    "value_list": [
+                        "Very High",
+                        "High",
+                        "Medium",
+                        "Low",
+                        "Very Low",
+                        "System Activity"
+                    ],
                     "default": "Medium",
                     "order": 2
                 }
@@ -133,57 +140,61 @@
                     "data_type": "string",
                     "column_name": "Attack",
                     "column_order": 2
-               },
-               {
+                },
+                {
                     "data_path": "action_result.data.*.target_ip",
                     "data_type": "string",
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "column_name": "Target IP",
                     "column_order": 3
-               },
-               {
+                },
+                {
                     "data_path": "action_result.data.*.severity",
                     "data_type": "string",
                     "column_name": "Severity",
                     "column_order": 1
-               },
-               {
+                },
+                {
                     "data_path": "action_result.data.*.target_os",
                     "data_type": "string",
                     "column_name": "Target OS",
                     "column_order": 4
-               },
-               {
+                },
+                {
                     "data_path": "action_result.data.*.timestamp",
                     "data_type": "string",
                     "column_name": "Time",
                     "column_order": 0
-               },
-               {
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string"
-               },
-               {
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
-               },
-               {
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
-               },
-               {
+                },
+                {
                     "data_path": "action_result.parameter.attacker_ip",
                     "data_type": "string",
-                    "contains": ["ip"]
-               },
-               {
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.hours_back",
                     "data_type": "string"
-               },
-               {
+                },
+                {
                     "data_path": "action_result.parameter.severity",
                     "data_type": "string"
-               }
+                }
             ],
             "render": {
                 "type": "table"
@@ -192,9 +203,9 @@
         },
         {
             "action": "check user",
-            "identifier": "check_user",
             "description": "Verify whether a user is Deceptive",
             "type": "investigate",
+            "identifier": "check_user",
             "read_only": true,
             "parameters": {
                 "user": {
@@ -248,9 +259,9 @@
         },
         {
             "action": "check host",
-            "identifier": "check_host",
             "description": "Verify whether a host is Deceptive",
             "type": "investigate",
+            "identifier": "check_host",
             "read_only": true,
             "parameters": {
                 "host": {
@@ -282,7 +293,9 @@
                     "data_path": "action_result.data.*.ip",
                     "data_type": "string",
                     "column_name": "IP",
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "column_order": 2
                 },
                 {
@@ -341,9 +354,9 @@
         },
         {
             "action": "list hosts",
-            "identifier": "list_hosts",
             "description": "List all deceptive hosts (network decoys) on the Attivo BOTsink",
             "type": "investigate",
+            "identifier": "list_hosts",
             "read_only": true,
             "parameters": {},
             "output": [
@@ -357,7 +370,9 @@
                     "data_path": "action_result.data.*.ip",
                     "data_type": "string",
                     "column_name": "IP",
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "column_order": 1
                 },
                 {
@@ -408,14 +423,14 @@
             },
             "versions": "EQ(*)"
         },
-	    {
-	        "action": "list users",
-            "identifier": "list_users",
+        {
+            "action": "list users",
             "description": "List all deceptive users on the Attivo BOTsink",
             "type": "investigate",
+            "identifier": "list_users",
             "read_only": true,
             "parameters": {},
-	        "output": [
+            "output": [
                 {
                     "data_path": "action_result.data.*.user",
                     "data_type": "string",
@@ -446,14 +461,14 @@
             },
             "versions": "EQ(*)"
         },
-	    {
-	        "action": "list playbooks",
-            "identifier": "list_playbooks",
+        {
+            "action": "list playbooks",
             "description": "List all configured playbooks on the Attivo BOTsink",
             "type": "investigate",
+            "identifier": "list_playbooks",
             "read_only": true,
             "parameters": {},
-	        "output": [
+            "output": [
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
@@ -504,9 +519,9 @@
         },
         {
             "action": "run playbook",
-            "identifier": "run_playbook",
             "description": "Run a preconfigured Playbook on the Attivo BOTsink",
             "type": "generic",
+            "identifier": "run_playbook",
             "read_only": false,
             "parameters": {
                 "playbook_name": {
@@ -521,7 +536,9 @@
                     "data_type": "string",
                     "required": false,
                     "primary": true,
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "default": "1",
                     "order": 1
                 }
@@ -537,7 +554,9 @@
                 {
                     "data_path": "action_result.parameter.attacker_ip",
                     "data_type": "string",
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "column_name": "Attacker_IP",
                     "column_order": 1
                 },
@@ -567,10 +586,10 @@
         },
         {
             "action": "deploy decoy",
-            "identifier": "deploy_decoy",
             "description": "Bring up a network decoy system",
             "verbose": "Bring up decoy systems on the Attivo BOTsink appliance",
             "type": "correct",
+            "identifier": "deploy_decoy",
             "read_only": false,
             "parameters": {
                 "vulnerable_endpoint": {
@@ -578,7 +597,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "order": 0
                 },
                 "decoy_number": {
@@ -594,7 +615,9 @@
                 {
                     "data_path": "action_result.parameter.vulnerable_endpoint",
                     "data_type": "string",
-                    "contains": ["ip"],
+                    "contains": [
+                        "ip"
+                    ],
                     "column_name": "Vulnerable Endpoint",
                     "column_order": 0
                 },
