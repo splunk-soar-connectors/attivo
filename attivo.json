@@ -77,10 +77,15 @@
             "read_only": true,
             "parameters": {
                 "severity": {
-                    "description": "Minimum severity of events to retrieve (i.e. 'Medium', 'High')",
+                    "description": "Minimum severity of events to retrieve",
                     "data_type": "string",
                     "default": "High",
-                    "order": 0
+                    "order": 0,
+                    "value_list": [
+                        "High",
+                        "Medium",
+                        "Low"
+                    ]
                 },
                 "first_fetch": {
                     "description": "How many days back to fetch alerts on the first run. ('0' means don't fetch any historic alerts)",
@@ -118,7 +123,7 @@
                     "order": 1
                 },
                 "severity": {
-                    "description": "severity of alerts generated in Attivo",
+                    "description": "Severity of alerts generated in Attivo",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
