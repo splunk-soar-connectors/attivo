@@ -256,62 +256,70 @@ class AttivoConnector(BaseConnector):
         td_monitoring = attivo_api.get_threatdirect_rules()
         bs_monitoring = attivo_api.get_monitoring_rules()
 
-        if td_monitoring['forwarder_vm_monitoring_rules']['forwarderVmMonitoringRules']:
-            for rule in td_monitoring['forwarder_vm_monitoring_rules']['forwarderVmMonitoringRules']:
-                if rule['type'] == 'onNet':
-                    td_type = "EP"
-                else:
-                    td_type = "VM"
+        try:
+            if td_monitoring['forwarder_vm_monitoring_rules']['forwarderVmMonitoringRules']:
+                for rule in td_monitoring['forwarder_vm_monitoring_rules']['forwarderVmMonitoringRules']:
+                    if rule['type'] == 'onNet':
+                        td_type = "EP"
+                    else:
+                        td_type = "VM"
 
-                host_names = []
-                if 'dnsName' in rule and rule['dnsName']:
-                    host_names.append(rule['dnsName'])
+                    host_names = []
+                    if 'dnsName' in rule and rule['dnsName']:
+                        host_names.append(rule['dnsName'])
 
-                host_entry = {
-                                'ip': rule['ip'],
-                                'mac': rule['customized_mac'],
-                                'vlan': rule['vlanID'],
-                                'dhcp': rule['dhcpip'],
-                                'td_name': rule['threatDirectName'],
-                                'td_type': td_type,
-                                'host': ', '.join(host_names)
-                             }
+                    host_entry = {
+                                    'ip': rule['ip'],
+                                    'mac': rule['customized_mac'],
+                                    'vlan': rule['vlanID'],
+                                    'dhcp': rule['dhcpip'],
+                                    'td_name': rule['threatDirectName'],
+                                    'td_type': td_type,
+                                    'host': ', '.join(host_names)
+                                }
 
-                self.save_progress("ThreatDirect host entry: {}".format(host_entry))
+                    self.save_progress("ThreatDirect host entry: {}".format(host_entry))
 
-                num_hosts += 1
-                action_result.add_data(host_entry)
-                # all_hosts.append(host_entry)
+                    num_hosts += 1
+                    action_result.add_data(host_entry)
+                    # all_hosts.append(host_entry)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                'Error occurred while fetching threat direct rules. Error: {0}. Detailed error: {1}'.format(td_monitoring, str(e)))
 
-        if bs_monitoring['cfg_monitoring_rules']['monitoringRules']:
-            for rule in bs_monitoring['cfg_monitoring_rules']['monitoringRules']:
-                vlan = rule['vlanID']
-                if vlan == -1:
-                    vlan = None
+        try:
+            if bs_monitoring['cfg_monitoring_rules']['monitoringRules']:
+                for rule in bs_monitoring['cfg_monitoring_rules']['monitoringRules']:
+                    vlan = rule['vlanID']
+                    if vlan == -1:
+                        vlan = None
 
-                host_names = []
-                if 'dnsName' in rule and rule['dnsName']:
-                    host_names.append(rule['dnsName'])
-                if 'interfaceName' in rule and rule['interfaceName']:
-                    host_names.append(rule['interfaceName'])
+                    host_names = []
+                    if 'dnsName' in rule and rule['dnsName']:
+                        host_names.append(rule['dnsName'])
+                    if 'interfaceName' in rule and rule['interfaceName']:
+                        host_names.append(rule['interfaceName'])
 
-                host_entry = {
-                                'ip': rule['ipAddress'],
-                                'mac': rule['externalMAC'],
-                                'dhcp': rule['isDHCPIP'],
-                                'vlan': vlan,
-                                'user_defined': rule['userDefined'],
-                                'host': ", ".join(host_names)
-                             }
+                    host_entry = {
+                                    'ip': rule['ipAddress'],
+                                    'mac': rule['externalMAC'],
+                                    'dhcp': rule['isDHCPIP'],
+                                    'vlan': vlan,
+                                    'user_defined': rule['userDefined'],
+                                    'host': ", ".join(host_names)
+                                }
 
-                if td_monitoring is not None:
-                    host_entry['td_name'] = ''
-                    host_entry['td_type'] = ''
+                    if td_monitoring is not None:
+                        host_entry['td_name'] = ''
+                        host_entry['td_type'] = ''
 
-                self.save_progress("BOTSink host entry: {}".format(host_entry))
-                action_result.add_data(host_entry)
-                num_hosts += 1
-                # all_hosts.append(host_entry)
+                    self.save_progress("BOTSink host entry: {}".format(host_entry))
+                    action_result.add_data(host_entry)
+                    num_hosts += 1
+                    # all_hosts.append(host_entry)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                'Error occurred while fetching monitoring rules. Error: {0}. Detailed error: {1}'.format(bs_monitoring, str(e)))
 
     # if td_monitoring['forwarder_vm_monitoring_rules']['forwarderVmMonitoringRules']:
     #     headers.append('TD Name')
@@ -345,35 +353,40 @@ class AttivoConnector(BaseConnector):
 
         # Check native Monitoring Rules
         bs_monitoring = attivo_api.get_monitoring_rules()
-        if bs_monitoring is not None:
-            for rule in bs_monitoring['cfg_monitoring_rules']['monitoringRules']:
-                this_ip = rule['ipAddress']
-                mac = rule['externalMAC']
-                dhcp = rule['isDHCPIP']
-                vlan = rule['vlanID']
-                if vlan == -1:
-                    vlan = None
-                user_defined = rule['userDefined']
-                this_host_name = []
-                if 'dnsName' in rule and rule['dnsName']:
-                    this_host_name.append(rule['dnsName'])
-                if rule['interfaceName']:
-                    this_host_name.append(rule['interfaceName'])
 
-                if ip_address and this_ip == ip_address:
-                    summary['is_deceptive'] = True
-                    message = "Host {} IS part of the Attivo deception environment".format(host)
-                    self.save_progress("BOTSink IP MATCH ({ip}) ({name}) ({user_defined}) ({mac}) ({dhcp}) ({vlan})".format(
-                        ip=this_ip, name=this_host_name, user_defined=user_defined, mac=mac, dhcp=dhcp, vlan=vlan)
-                    )
-                    break
-                elif host_name and this_host_name and host_name in this_host_name:
-                    summary['is_deceptive'] = True
-                    message = "Host {} IS part of the Attivo deception environment".format(host)
-                    self.save_progress("BOTSink HOST MATCH ({ip}) ({name}) ({user_defined}) ({mac}) ({dhcp}) ({vlan})".format(
-                        ip=this_ip, name=this_host_name, user_defined=user_defined, mac=mac, dhcp=dhcp, vlan=vlan)
-                    )
-                    break
+        try:
+            if bs_monitoring is not None:
+                for rule in bs_monitoring['cfg_monitoring_rules']['monitoringRules']:
+                    this_ip = rule['ipAddress']
+                    mac = rule['externalMAC']
+                    dhcp = rule['isDHCPIP']
+                    vlan = rule['vlanID']
+                    if vlan == -1:
+                        vlan = None
+                    user_defined = rule['userDefined']
+                    this_host_name = []
+                    if 'dnsName' in rule and rule['dnsName']:
+                        this_host_name.append(rule['dnsName'])
+                    if rule['interfaceName']:
+                        this_host_name.append(rule['interfaceName'])
+
+                    if ip_address and this_ip == ip_address:
+                        summary['is_deceptive'] = True
+                        message = "Host {} IS part of the Attivo deception environment".format(host)
+                        self.save_progress("BOTSink IP MATCH ({ip}) ({name}) ({user_defined}) ({mac}) ({dhcp}) ({vlan})".format(
+                            ip=this_ip, name=this_host_name, user_defined=user_defined, mac=mac, dhcp=dhcp, vlan=vlan)
+                        )
+                        break
+                    elif host_name and this_host_name and host_name in this_host_name:
+                        summary['is_deceptive'] = True
+                        message = "Host {} IS part of the Attivo deception environment".format(host)
+                        self.save_progress("BOTSink HOST MATCH ({ip}) ({name}) ({user_defined}) ({mac}) ({dhcp}) ({vlan})".format(
+                            ip=this_ip, name=this_host_name, user_defined=user_defined, mac=mac, dhcp=dhcp, vlan=vlan)
+                        )
+                        break
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                'Error occurred while fetching Attivo monitoring rules. Error: {0}. Detailed error: {1}'.format(bs_monitoring, str(e)))
 
         if not summary['is_deceptive']:
             # Check ThreatDirect Monitoring Rules
@@ -436,19 +449,23 @@ class AttivoConnector(BaseConnector):
 
         user_groups = attivo_api.get_deceptive_objects('USERS', 'ALL')
         users = {}
-        for user_group in user_groups['objGroup']:
-            group_id = user_group['esid']
-            group_name = user_group['name']
-            users_in_group = attivo_api.get_deceptive_objects('USERS', group_id)
+        try:
+            for user_group in user_groups['objGroup']:
+                group_id = user_group['esid']
+                group_name = user_group['name']
+                users_in_group = attivo_api.get_deceptive_objects('USERS', group_id)
 
-            self.save_progress("USERS IN GROUP: {}".format(users_in_group))
+                self.save_progress("USERS IN GROUP: {}".format(users_in_group))
 
-            for user_object in users_in_group['objGroup']['objects']:
-                user = user_object['username']
-                if user in users:
-                    users[user].append(group_name)
-                else:
-                    users[user] = [group_name]
+                for user_object in users_in_group['objGroup']['objects']:
+                    user = user_object['username']
+                    if user in users:
+                        users[user].append(group_name)
+                    else:
+                        users[user] = [group_name]
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                'Error occurred while fetching user groups. Error: {0}. Detailed error: {1}'.format(user_groups, str(e)))
 
         attivo_api.logout()
         # all_users = []
@@ -479,20 +496,25 @@ class AttivoConnector(BaseConnector):
 
         user_groups = attivo_api.get_deceptive_objects('USERS', 'ALL')
         in_groups = []
-        for user_group in user_groups['objGroup']:
-            group_id = user_group['esid']
 
-            # self.save_progress("GROUP ID {}".format(group_id))
+        try:
+            for user_group in user_groups['objGroup']:
+                group_id = user_group['esid']
 
-            users_in_group = attivo_api.get_deceptive_objects('USERS', group_id)
-            for user_object in users_in_group['objGroup']['objects']:
-                this_user = user_object['username']
-                if this_user == user:
-                    self.save_progress("BOTSink USER MATCH ({user}) ({groups})".format(user=this_user, groups=user_group['name']))
-                    summary['is_deceptive'] = True
-                    message = "User {} IS part of Attivo deception".format(user)
-                    in_groups.append(user_group['name'])
-                    break
+                # self.save_progress("GROUP ID {}".format(group_id))
+
+                users_in_group = attivo_api.get_deceptive_objects('USERS', group_id)
+                for user_object in users_in_group['objGroup']['objects']:
+                    this_user = user_object['username']
+                    if this_user == user:
+                        self.save_progress("BOTSink USER MATCH ({user}) ({groups})".format(user=this_user, groups=user_group['name']))
+                        summary['is_deceptive'] = True
+                        message = "User {} IS part of Attivo deception".format(user)
+                        in_groups.append(user_group['name'])
+                        break
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                'Error occurred while fetching User Groups. Error: {0}. Detailed error: {1}'.format(user_groups, str(e)))
 
         if summary['is_deceptive']:
             summary['user_group'] = in_groups
@@ -512,48 +534,51 @@ class AttivoConnector(BaseConnector):
 
         all_playbooks = attivo_api.get_playbooks()
         attivo_api.logout()
+        try:
+            brief_playbook = {}
+            for playbook in all_playbooks['pb']:
+                brief_playbook = {
+                    'id': playbook['id'],
+                    'name': playbook['name']
+                }
 
-        brief_playbook = {}
-        for playbook in all_playbooks['pb']:
-            brief_playbook = {
-                'id': playbook['id'],
-                'name': playbook['name']
-            }
+                if len(playbook['investigate']) > 0:
+                    investigate_names = []
+                    for investigate in playbook['investigate']:
+                        investigate_names.append(investigate['name'])
+                    brief_playbook['investigate'] = ', '.join(investigate_names)
+                else:
+                    brief_playbook['investigate'] = []
 
-            if len(playbook['investigate']) > 0:
-                investigate_names = []
-                for investigate in playbook['investigate']:
-                    investigate_names.append(investigate['name'])
-                brief_playbook['investigate'] = ', '.join(investigate_names)
-            else:
-                brief_playbook['investigate'] = []
+                if len(playbook['analyze']) > 0:
+                    analyze_names = []
+                    for analyze in playbook['analyze']:
+                        analyze_names.append(analyze['name'])
+                    brief_playbook['analyze'] = ', '.join(analyze_names)
+                else:
+                    brief_playbook['analyze'] = []
 
-            if len(playbook['analyze']) > 0:
-                analyze_names = []
-                for analyze in playbook['analyze']:
-                    analyze_names.append(analyze['name'])
-                brief_playbook['analyze'] = ', '.join(analyze_names)
-            else:
-                brief_playbook['analyze'] = []
+                if len(playbook['manage']) > 0:
+                    manage_names = []
+                    for manage in playbook['manage']:
+                        manage_names.append(manage['name'])
+                    brief_playbook['manage'] = ', '.join(manage_names)
+                else:
+                    brief_playbook['manage'] = []
 
-            if len(playbook['manage']) > 0:
-                manage_names = []
-                for manage in playbook['manage']:
-                    manage_names.append(manage['name'])
-                brief_playbook['manage'] = ', '.join(manage_names)
-            else:
-                brief_playbook['manage'] = []
+                if len(playbook['isolate']) > 0:
+                    isolate_names = []
+                    for isolate in playbook['isolate']:
+                        isolate_names.append(isolate['name'])
+                    brief_playbook['isolate'] = ', '.join(isolate_names)
+                else:
+                    brief_playbook['isolate'] = []
 
-            if len(playbook['isolate']) > 0:
-                isolate_names = []
-                for isolate in playbook['isolate']:
-                    isolate_names.append(isolate['name'])
-                brief_playbook['isolate'] = ', '.join(isolate_names)
-            else:
-                brief_playbook['isolate'] = []
-
-            self.save_progress("Attivo Playbooks: {}".format(brief_playbook))
-            action_result.add_data(brief_playbook)
+                self.save_progress("Attivo Playbooks: {}".format(brief_playbook))
+                action_result.add_data(brief_playbook)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                'Error occurred while fetching playbook. Error: {0}. Detailed error: {1}'.format(all_playbooks, str(e)))
 
         message = "{} Attivo playbooks found".format(len(all_playbooks['pb']))
         return action_result.set_status(phantom.APP_SUCCESS, status_message=message)
@@ -573,10 +598,14 @@ class AttivoConnector(BaseConnector):
 
         # Find playbook ID
         all_playbooks = attivo_api.get_playbooks()
-        for playbook in all_playbooks['pb']:
-            if playbook['name'] == playbook_name:
-               playbook_id = playbook['id']
-               break
+        try:
+            for playbook in all_playbooks['pb']:
+                if playbook['name'] == playbook_name:
+                    playbook_id = playbook['id']
+                    break
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                'Error occurred while fetching playbooks. Error: {0}. Detailed error: {1}'.format(all_playbooks, str(e)))
 
         if not playbook_id:
             self.save_progress("ID not found for Attivo playbook named: {}".format(playbook_name))
@@ -629,29 +658,33 @@ class AttivoConnector(BaseConnector):
         timestampStart = str((int(time.time()) - seconds_back) * 1000)
         events = attivo_api.get_events(severity_start=severity, severity_end=severity_end, timestampStart=timestampStart, timestampEnd=timestampEnd, attackerIP=attacker_ips)
 
-        if events is None:
-            events = []
-            self.save_progress("Total events retrieved: None")
-        else:
-            self.save_progress("Total events retrieved: {event_count}".format(event_count=len(events['eventdata'])))
-            # self.save_progress("EVENTS: {}".format(events))
+        try:
+            if events is None:
+                events = []
+                self.save_progress("Total events retrieved: None")
+            else:
+                self.save_progress("Total events retrieved: {event_count}".format(event_count=len(events['eventdata'])))
+                # self.save_progress("EVENTS: {}".format(events))
 
-        attivo_api.logout()
+            attivo_api.logout()
 
-        # brief_events = []
-        for event in events['eventdata']:
-            attack_name = event['attackName']
-            severity = event['details']['Severity']
-            target_ip = event['details']['Target IP']
-            target_os = event['details']['Target OS']
-            timestamp = event['details']['Timestamp']
-            brief_event = {'attack_name': attack_name, 'target_ip': target_ip, 'target_os': target_os, 'timestamp': timestamp, 'severity': severity}
-            # brief_events.append(brief_event)
-            action_result.add_data(brief_event)
+            # brief_events = []
+            for event in events['eventdata']:
+                attack_name = event['attackName']
+                severity = event['details']['Severity']
+                target_ip = event['details']['Target IP']
+                target_os = event['details']['Target OS']
+                timestamp = event['details']['Timestamp']
+                brief_event = {'attack_name': attack_name, 'target_ip': target_ip, 'target_os': target_os, 'timestamp': timestamp, 'severity': severity}
+                # brief_events.append(brief_event)
+                action_result.add_data(brief_event)
 
-            self.save_progress("Event: {time},{severity},{name},{target_ip},{target_os}".format(
-                time=timestamp, severity=severity, name=attack_name, target_ip=target_ip, target_os=target_os)
-            )
+                self.save_progress("Event: {time},{severity},{name},{target_ip},{target_os}".format(
+                    time=timestamp, severity=severity, name=attack_name, target_ip=target_ip, target_os=target_os)
+                )
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                'Error occurred while fetching events. Error: {0}. Detailed error: {1}'.format(events, str(e)))
 
         summary['ip'] = attacker_ips[0]
         summary['hours_back'] = hours_back
@@ -880,9 +913,10 @@ if __name__ == '__main__':
         password = getpass.getpass("Password: ")
 
     if (username and password):
+        login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
             print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -892,10 +926,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = login_url
 
             print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print ("Unable to get session id from the platfrom. Error: " + str(e))
